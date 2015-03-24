@@ -1,0 +1,18 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET        /v1/languages/api-docs                  controllers.ApiHelpController.getResources
+
+GET        /v1/languages/api-docs/languages        controllers.ApiHelpController.getResource(path = "/languages")
+
+# Map static resources from the /public folder to the /assets URL path
+GET        /v1/languages/assets/*file              controllers.Assets.at(path="/public", file)
+
+# Health Check
+GET        /v1/languages/health                    @controllers.LanguagesController.healthCheck()
+
+# Home page
+GET        /v1/languages                           @controllers.LanguagesController.getLanguages()
+
+GET        /v1/languages/:language                 @controllers.LanguagesController.getLanguage(language:String)
