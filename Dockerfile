@@ -1,8 +1,8 @@
 FROM        ubuntu:14.04
 
-MAINTAINER  Adam Alexander <adamalex@gmail.com>
+MAINTAINER  ram natarajan <rnatarajan@user.com>
 
-ENV         ACTIVATOR_VERSION 1.2.8
+ENV         ACTIVATOR_VERSION 1.2.10
 ENV         DEBIAN_FRONTEND noninteractive
 
 # INSTALL OS DEPENDENCIES
@@ -21,21 +21,33 @@ RUN         cd /tmp && \
             unzip typesafe-activator-$ACTIVATOR_VERSION.zip -d /usr/local && \
             mv /usr/local/activator-$ACTIVATOR_VERSION /usr/local/activator && \
             rm typesafe-activator-$ACTIVATOR_VERSION.zip
+			
+RUN 	sudo mkdir -p /opt/docker/logs
 
-# COMMIT PROJECT FILES
-ADD         app /root/app
-ADD         test /root/test
-ADD         conf /root/conf
-ADD         public /root/public
-ADD         build.sbt /root/
-ADD         project/plugins.sbt /root/project/
-ADD         project/build.properties /root/project/
+RUN 	sudo ls -alrt /opt/docker/logs
+COPY         web/app /opt/docker/web/app
+COPY         web/test /opt/docker/web/test
+COPY         web/conf /opt/docker/web/conf
+COPY         web/public /opt/docker/web/public
+COPY         web/build.sbt /opt/docker/web/
+COPY         web/project/plugins.sbt /opt/docker/web/project/
+COPY         web/project/build.properties /opt/docker/web/project/
+COPY		 web/activator* /opt/docker/web/
+COPY			services/* /opt/docker/services/
 
-# TEST AND BUILD THE PROJECT -- FAILURE WILL HALT IMAGE CREATION
-RUN         cd /root; /usr/local/activator/activator test stage
-RUN         rm /root/target/universal/stage/bin/*.bat
+WORKDIR /opt/docker/web/
 
-# TESTS PASSED -- CONFIGURE IMAGE
-WORKDIR     /root
-ENTRYPOINT  target/universal/stage/bin/$(ls target/universal/stage/bin)
-EXPOSE      9000
+
+
+
+RUN echo =========================================================================
+RUN        cd /opt/docker/web/; /usr/local/activator/activator clean  docker:stage
+
+RUN echo =========================================================================
+RUN pwd
+volume = "ls -alrt /opt/docker/services/"
+
+RUN echo =========================================================================
+RUN echo $volume
+RUN echo =========================================================================
+##RUN         rm /build/docker/target/universal/stage/bin/*.bat
